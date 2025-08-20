@@ -4513,24 +4513,23 @@
             updateWalletDisplay();
             updateWalletModalBalances();
         }
-        // Global variables
-        let appVerifier;
-        let confirmationResult;
-        let currentUser = null;
-        let otpTimer = null;
-        let resendCountdown = 60;
-        let userBalance = 0.0000;
-        let miningRate = 0.001;
-        let isMining = false;
-        let totalTasksCompleted = 0;
-        let selectedSovereignType = null;
-        let selectedValueType = null;
-        let selectedValueAmount = 0;
+    function openWalletModal(modalType) {
+    document.getElementById(modalType + 'Modal').style.display = 'block';
+    updateWalletModalBalances();
+}
 
-        // Global wallet variables
-        let minedBalance = 0.0000;  // Balance from mining
-        let receivedBalance = 0.0000;  // Balance from receiving tokens
-        let reserveBalance = 0.0000;  // Emergency reserve balance
+function closeWalletModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function updateWalletModalBalances() {
+    // Update balance displays in modals
+    const elements = ['sendAvailableBalance', 'lockupAvailableBalance'];
+    elements.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = `${(minedBalance + receivedBalance).toFixed(4)} iKb`;
+    });
+}
         
         function copyAddress() {
             copyWalletAddress();

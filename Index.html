@@ -1023,7 +1023,7 @@
                         <div class="logo-img">iKb</div>
                         <div>
                             <div class="app-title">KABIRU[iKb]</div>
-                            <div class="subtitle">Mine Kabiru Token</div>
+                            <div class="subtitle">Mine Intelligent Token</div>
                         </div>
                     </div>
                 </div>
@@ -1080,7 +1080,56 @@
                         <div class="stat-label">TASKS</div>
                     </div>
                 </div>
+<!-- Tasks & Rewards Section -->
+            <div class="tasks-section">
+                <div class="tasks-header">
+                    <div class="tasks-title">Tasks</div>
+                    <div class="reward-info">Reward</div>
+                </div>
+                
+                <div class="task-categories">
+                    <div class="task-category" onclick="selectTask('mining')">
+                        <div class="category-title">iKb(M)</div>
+                        <div class="category-subtitle">Gen ledger</div>
+                    </div>
+                    <div class="task-category" onclick="selectTask('partnership')">
+                        <div class="category-title">iKb(P)</div>
+                        <div class="category-subtitle">Partnership</div>
+                    </div>
+                    <div class="task-category" onclick="selectTask('genledger')">
+                        <div class="category-title">iKb(GL)</div>
+                        <div class="category-subtitle">Gen ledger</div>
+                    </div>
+                </div>
 
+                <div class="value-categories">
+                    <div class="value-item" onclick="performTask('service')">Service<br><small>value</small></div>
+                    <div class="value-item" onclick="performTask('skill')">Skill<br><small>value</small></div>
+                    <div class="value-item" onclick="performTask('knowledge')">Knowledge<br><small>value</small></div>
+                </div>
+            </div>
+
+            <!-- Personal Ledger Section -->
+            <div class="personal-ledger">
+                <div class="ledger-grid">
+                    <div class="ledger-item">
+                        <div class="ledger-title">personal</div>
+                        <div>Ledger</div>
+                    </div>
+                    <div class="ledger-item">
+                        <div class="ledger-title">Generation</div>
+                        <div>Asset</div>
+                    </div>
+                    <div class="ledger-item">
+                        <div class="ledger-title">Information</div>
+                        <div>Asset</div>
+                    </div>
+                    <div class="ledger-item">
+                        <div class="ledger-title">iKb</div>
+                        <div>intelligent</div>
+                    </div>
+                </div>
+            </div>
                 <!-- Footer with Logout -->
                 <div style="text-align: center; font-size: 12px; opacity: 0.6; margin-top: 20px;">
                     <button onclick="logout()" style="background: none; border: none; color: #FFD700; font-size: 12px; cursor: pointer; text-decoration: underline; opacity: 0.8; transition: opacity 0.3s ease;">
@@ -1278,52 +1327,153 @@
             </div>
         </div>
 
-        <!-- Read/Documentation Page -->
-        <div id="readPage" class="page">
-            <div class="container">
-                <!-- Read Header -->
-                <div class="page-header">
-                    <button class="back-button" onclick="showMain()">←</button>
-                    <div class="page-title">Documentation</div>
+        <!-- Read Page -->
+    <div id="readPage" class="read-page">
+        <div class="container">
+            <!-- Read Header -->
+            <div class="utilities-header">
+                <button class="back-button" onclick="showMiningApp()">←</button>
+                <div class="utilities-title">Documentation</div>
+            </div>
+
+            <!-- Documentation Grid -->
+            <div class="read-grid">
+                <div class="read-card" onclick="showDocument('whitepaper')">
+                    <span class="read-icon">📄</span>
+                    <div class="read-name">Whitepaper</div>
+                    <div class="read-desc">Technical documentation and project overview</div>
                 </div>
 
-                <!-- Documentation Grid -->
-                <div class="utilities-grid">
-                    <div class="utility-card" onclick="showDocument('whitepaper')">
-                        <span class="utility-icon">📄</span>
-                        <div class="utility-name">Whitepaper</div>
-                        <div class="utility-desc">Technical documentation and project overview</div>
-                    </div>
+                <div class="read-card" onclick="showDocument('rules')">
+                    <span class="read-icon">📋</span>
+                    <div class="read-name">Rules</div>
+                    <div class="read-desc">Platform rules and community guidelines</div>
+                </div>
 
-                    <div class="utility-card" onclick="showDocument('rules')">
-                        <span class="utility-icon">📋</span>
-                        <div class="utility-name">Rules</div>
-                        <div class="utility-desc">Platform rules and community guidelines</div>
-                    </div>
+                <div class="read-card" onclick="showDocument('terms')">
+                    <span class="read-icon">📜</span>
+                    <div class="read-name">Terms</div>
+                    <div class="read-desc">Terms of service and usage agreement</div>
+                </div>
 
-                    <div class="utility-card" onclick="showDocument('terms')">
-                        <span class="utility-icon">📜</span>
-                        <div class="utility-name">Terms</div>
-                        <div class="utility-desc">Terms of service and usage agreement</div>
-                    </div>
+                <div class="read-card" onclick="showDocument('privacy')">
+                    <span class="read-icon">🔒</span>
+                    <div class="read-name">Privacy Policy</div>
+                    <div class="read-desc">Data protection and privacy information</div>
+                </div>
 
-                    <div class="utility-card" onclick="showDocument('privacy')">
-                        <span class="utility-icon">🔒</span>
-                        <div class="utility-name">Privacy Policy</div>
-                        <div class="utility-desc">Data protection and privacy information</div>
-                    </div>
+                <div class="read-card" onclick="showDocument('roadmap')">
+                    <span class="read-icon">🗺️</span>
+                    <div class="read-name">Roadmap</div>
+                    <div class="read-desc">Project timeline and future developments</div>
+                </div>
 
-                    <div class="utility-card" onclick="showDocument('roadmap')">
-                        <span class="utility-icon">🗺️</span>
-                        <div class="utility-name">Roadmap</div>
-                        <div class="utility-desc">Project timeline and future developments</div>
-                    </div>
+                <div class="read-card" onclick="showDocument('faq')">
+                    <span class="read-icon">❓</span>
+                    <div class="read-name">FAQ</div>
+                    <div class="read-desc">Frequently asked questions and answers</div>
+                </div>
 
-                    <div class="utility-card" onclick="showDocument('faq')">
-                        <span class="utility-icon">❓</span>
-                        <div class="utility-name">FAQ</div>
-                        <div class="utility-desc">Frequently asked questions and answers</div>
-                    </div>
+                <div class="read-card" onclick="showDocument('changelog')">
+                    <span class="read-icon">📝</span>
+                    <div class="read-name">Changelog</div>
+                    <div class="read-desc">Version history and updates</div>
+                </div>
+
+                <div class="read-card" onclick="showDocument('api')">
+                    <span class="read-icon">🔗</span>
+                    <div class="read-name">API Docs</div>
+                    <div class="read-desc">Developer API documentation</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Viewer Page -->
+    <div id="documentPage" class="document-page">
+        <div class="container">
+            <!-- Document Header -->
+            <div class="utilities-header">
+                <button class="back-button" onclick="showReadPage()">←</button>
+                <div class="utilities-title" id="documentTitle">Document</div>
+            </div>
+
+            <!-- Document Content -->
+            <div id="documentContent" class="document-content">
+                <!-- Content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Utilities Page -->
+    <div id="utilitiesPage" class="utilities-page">
+        <div class="container">
+            <!-- Utilities Header -->
+            <div class="utilities-header">
+                <button class="back-button" onclick="showMiningApp()">←</button>
+                <div class="utilities-title">Utility Apps</div>
+            </div>
+
+            <!-- Utilities Grid -->
+            <div class="utilities-grid">
+                <div class="utility-card" onclick="openUtilityModal('education')">
+                    <span class="utility-icon">🎓</span>
+                    <div class="utility-name">Education</div>
+                    <div class="utility-desc">Learning platforms, courses, and academic resources</div>
+                </div>
+
+                <div class="utility-card" onclick="openUtilityModal('transport')">
+                    <span class="utility-icon">🚗</span>
+                    <div class="utility-name">Transport</div>
+                    <div class="utility-desc">Air, land, and water transportation services</div>
+                </div>
+
+                <div class="utility-card" onclick="openUtilityModal('agriculture')">
+                    <span class="utility-icon">🌾</span>
+                    <div class="utility-name">Agriculture</div>
+                    <div class="utility-desc">Farming tools, seeds, and agricultural services</div>
+                </div>
+
+                <div class="utility-card" onclick="openUtilityModal('marketplace')">
+                    <span class="utility-icon">🛒</span>
+                    <div class="utility-name">Marketplace</div>
+                    <div class="utility-desc">Buy and sell goods and services</div>
+                </div>
+
+                <div class="utility-card" onclick="openUtilityModal('media')">
+                    <span class="utility-icon">📺</span>
+                    <div class="utility-name">TV & Media</div>
+                    <div class="utility-desc">Entertainment, news, and media content</div>
+                </div>
+
+                <div class="utility-card" onclick="openUtilityModal('realestate')">
+                    <span class="utility-icon">🏠</span>
+                    <div class="utility-name">Real Estate</div>
+                    <div class="utility-desc">Property buying, selling, and rentals</div>
+                </div>
+
+                <div class="utility-card" onclick="openUtilityModal('climate')">
+                    <span class="utility-icon">🌍</span>
+                    <div class="utility-name">Climate</div>
+                    <div class="utility-desc">Weather, environmental monitoring</div>
+                </div>
+
+                <div class="utility-card" onclick="openUtilityModal('energy')">
+                    <span class="utility-icon">⚡</span>
+                    <div class="utility-name">Free Energy</div>
+                    <div class="utility-desc">Renewable energy solutions and resources</div>
+                </div>
+
+                <div class="utility-card" onclick="openUtilityModal('workshops')">
+                    <span class="utility-icon">⚒️</span>
+                    <div class="utility-name">Workshops</div>
+                    <div class="utility-desc">Skills training and workshop services</div>
+                </div>
+
+                <div class="utility-card" onclick="openUtilityModal('resources')">
+                    <span class="utility-icon">📚</span>
+                    <div class="utility-name">Resources</div>
+                    <div class="utility-desc">Tools, materials, and digital resources</div>
                 </div>
             </div>
         </div>
@@ -1617,16 +1767,16 @@
                     <div style="font-size: 12px; font-weight: bold; color: #FFD700;">Kiswahili</div>
                 </div>
                 <div style="padding: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s ease;" onclick="selectLanguage('french')">
-                    <div style="font-size: 24px; margin-bottom: 8px;">🇫🇷</div>
-                    <div style="font-size: 12px; font-weight: bold; color: #FFD700;">Français</div>
+                    <div style="font-size: 24px; margin-bottom: 8px;">🇰🇪</div>
+                    <div style="font-size: 12px; font-weight: bold; color: #FFD700;">Dholuo</div>
                 </div>
                 <div style="padding: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s ease;" onclick="selectLanguage('arabic')">
-                    <div style="font-size: 24px; margin-bottom: 8px;">🇪🇬</div>
-                    <div style="font-size: 12px; font-weight: bold; color: #FFD700;">العربية</div>
+                    <div style="font-size: 24px; margin-bottom: 8px;">🇰🇪</div>
+                    <div style="font-size: 12px; font-weight: bold; color: #FFD700;">اkikuyu</div>
                 </div>
             </div>
             <div style="text-align: center; margin-top: 20px; font-size: 12px; opacity: 0.7;">
-                More languages coming soon...
+                More African languages coming soon...
             </div>
         </div>
     </div>
@@ -2841,33 +2991,166 @@
 
         // Utility Functions
         function openUtilityModal(category) {
-            const utilityInfo = {
-                education: 'Educational platforms and courses for skill development',
-                transport: 'Transportation services including air, land, and water travel',
-                agriculture: 'Agricultural tools, seeds, and farming resources',
-                marketplace: 'Buy and sell goods and services in the community',
-                media: 'Entertainment, news, and media content',
-                realestate: 'Property buying, selling, and rental services',
-                climate: 'Weather monitoring and environmental data',
-                energy: 'Renewable energy solutions and resources',
-                workshops: 'Skills training and professional workshops',
-                resources: 'Digital tools, materials, and educational resources'
+            const subcategories = {
+                education: [
+                    { icon: '🎓', name: 'Universities', desc: 'Higher education institutions' },
+                    { icon: '📚', name: 'Online Courses', desc: 'Digital learning platforms' },
+                    { icon: '👶', name: 'Kindergarten', desc: 'Early childhood education' },
+                    { icon: '🏫', name: 'Schools', desc: 'Primary and secondary education' }
+                ],
+                transport: [
+                    { icon: '✈️', name: 'Airlines', desc: 'Air travel booking' },
+                    { icon: '🚗', name: 'Car Rental', desc: 'Vehicle rental services' },
+                    { icon: '🚌', name: 'Bus Travel', desc: 'Public transportation' },
+                    { icon: '🚢', name: 'Ships', desc: 'Maritime transport' }
+                ],
+                agriculture: [
+                    { icon: '🌱', name: 'Seeds', desc: 'Quality farming seeds' },
+                    { icon: '🚜', name: 'Equipment', desc: 'Agricultural machinery' },
+                    { icon: '🌾', name: 'Crops', desc: 'Crop management' },
+                    { icon: '💧', name: 'Irrigation', desc: 'Water management systems' }
+                ],
+                marketplace: [
+                    { icon: '🛍️', name: 'Shopping', desc: 'Buy and sell goods' },
+                    { icon: '🏪', name: 'Local Stores', desc: 'Community businesses' },
+                    { icon: '📱', name: 'Digital', desc: 'Online marketplace' },
+                    { icon: '🤝', name: 'Services', desc: 'Professional services' }
+                ]
             };
-            
-            showNotification(`${category.charAt(0).toUpperCase() + category.slice(1)}: ${utilityInfo[category] || 'Coming soon!'}`);
+
+            if (subcategories[category]) {
+                document.getElementById('subcategoryTitle').textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                const grid = document.getElementById('subcategoryGrid');
+                grid.innerHTML = '';
+                
+                subcategories[category].forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'subcategory-item';
+                    div.innerHTML = `
+                        <span class="subcategory-item-icon">${item.icon}</span>
+                        <div class="subcategory-item-name">${item.name}</div>
+                        <div class="subcategory-item-desc">${item.desc}</div>
+                    `;
+                    div.onclick = () => {
+                        showNotification(`Opening ${item.name}...`);
+                        closeSubcategoryModal();
+                    };
+                    grid.appendChild(div);
+                });
+                
+                document.getElementById('subcategoryModal').style.display = 'block';
+            } else {
+                showNotification(`${category} utilities coming soon!`);
+            }
         }
 
+        function closeSubcategoryModal() {
+            document.getElementById('subcategoryModal').style.display = 'none';
+        }
+
+        // Document Functions
         function showDocument(docType) {
             const documents = {
-                whitepaper: 'KABIRU Whitepaper: Technical documentation and project overview',
-                rules: 'Platform Rules: Community guidelines and usage policies',
-                terms: 'Terms of Service: Legal terms and conditions',
-                privacy: 'Privacy Policy: Data protection and privacy information',
-                roadmap: 'Project Roadmap: Timeline and future developments',
-                faq: 'FAQ: Frequently asked questions and answers'
+                whitepaper: {
+                    title: 'KABIRU Whitepaper Summary',
+                    content: `
+                        <div class="version-info">Version 1.0 - Published January 2024</div>
+                        
+                        <div class="document-section-title">Executive Summary</div>
+                        <div class="document-text">
+                            KABIRU is a revolutionary value-based token mining ecosystem that enables individuals to mine cryptocurrency through meaningful contributions to their communities and society. Unlike traditional energy-intensive mining, KABIRU rewards users for creating real-world value through services, skills, knowledge sharing, and leadership.
+                        </div>
+                        
+                        <div class="document-section-title">Technology</div>
+                        <div class="document-text">
+                            Built on a sustainable blockchain architecture, KABIRU utilizes a Proof-of-Value consensus mechanism that validates contributions rather than computational power. The platform integrates Firebase authentication, real-time data synchronization, and cross-platform compatibility.
+                        </div>
+                        
+                        <div class="document-section-title">Tokenomics</div>
+                        <div class="document-text">
+                            Total Supply: 1,000,000,000 iKb tokens<br>
+                            Mining Distribution: 60% (600M tokens)<br>
+                            Development Fund: 20% (200M tokens)<br>
+                            Community Rewards: 15% (150M tokens)<br>
+                            Team & Advisors: 5% (50M tokens)
+                        </div>
+                        
+                        <div class="document-section-title">Roadmap</div>
+                        <div class="document-text">
+                            Q1 2025: Platform Launch & Beta Testing<br>
+                            Q2 2026: iKb Token and Utility Mobile App Release<br>
+                            Q3 2027: Ecosystem Utility Integration<br>
+                            Q4 2030: Africa Adoption and Expansion
+                        </div>
+                    `
+                },
+                rules: {
+                    title: 'Platform Rules(summery)',
+                    content: `
+                        <div class="document-section-title">General Guidelines</div>
+                        <div class="document-text">
+                            1. Users must verify their identity through email or phone authentication<br>
+                            2. All mining activities must contribute genuine value to the community<br>
+                            3. Fraudulent or spam activities will result in account suspension<br>
+                            4. One account per person - multiple accounts are prohibited
+                        </div>
+                        
+                        <div class="document-section-title">Mining Rules</div>
+                        <div class="document-text">
+                            1. Mining rewards are distributed based on value contribution<br>
+                            2. Daily mining limits apply to prevent abuse<br>
+                            3. Mining sessions must be completed within specified timeframes<br>
+                            4. Quality of contribution affects reward multipliers
+                        </div>
+                        
+                        <div class="document-section-title">Community Standards</div>
+                        <div class="document-text">
+                            1. Respect all community members<br>
+                            2. No harassment, discrimination, or hate speech<br>
+                            3. Maintain professional conduct in all interactions<br>
+                            4. Report violations to the moderation team
+                        </div>
+                    `
+                },
+                terms: {
+                    title: 'Terms of Service summery',
+                    content: `
+                        <div class="document-section-title">Acceptance of Terms</div>
+                        <div class="document-text">
+                            By using KABIRU and it's Applications, you agree to these terms and conditions. If you disagree with any part of these terms, you may not use the service.
+                        </div>
+                        
+                        <div class="document-section-title">User Responsibilities</div>
+                        <div class="document-text">
+                            Users are responsible for maintaining the security of their accounts, providing accurate information, and complying with all applicable laws and regulations.
+                        </div>
+                        
+                        <div class="document-section-title">Service Availability</div>
+                        <div class="document-text">
+                            We strive to maintain 99.9% uptime but cannot guarantee uninterrupted service. Scheduled maintenance will be announced in advance.
+                        </div>
+                        
+                        <div class="document-section-title">Limitation of Liability</div>
+                        <div class="document-text">
+                            KABIRU is not liable for any indirect, incidental, or consequential damages arising from use of the platform.
+                        </div>
+                    `
+                }
             };
-            
-            showNotification(`${documents[docType] || 'Document coming soon!'}`);
+
+            if (documents[docType]) {
+                document.getElementById('documentTitle').textContent = documents[docType].title;
+                document.getElementById('documentContent').innerHTML = `
+                    <div class="document-title">${documents[docType].title}</div>
+                    ${documents[docType].content}
+                `;
+                
+                hideAllPages();
+                document.getElementById('miningApp').style.display = 'none';
+                document.getElementById('documentPage').style.display = 'block';
+            } else {
+                showNotification(`${docType} documentation coming soon!`);
+            }
         }
 
         // Language Functions

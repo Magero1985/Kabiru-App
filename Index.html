@@ -947,7 +947,6 @@
                     Already have an account? <span class="auth-toggle-link" onclick="showLogin()">Sign In</span>
                 </div>
             </div>
-
             <!-- Password Reset Form -->
             <div id="passwordResetContainer" style="display: none;">
                 <div class="form-group">
@@ -1750,6 +1749,437 @@
                 setTimeout(() => {
                     showLogin();
                 }, 2000);
+                
+            } catch (error) {
+                console.error('❌ Password reset confirmation error:', error);
+                document.querySelector('#actualPasswordResetContainer .auth-button').textContent = 'Reset Password';
+                document.querySelector('#actualPasswordResetContainer .auth-button').disabled = false;
+                
+                let errorMessage = 'Password reset failed. ';
+                switch (error.code) {
+                    case 'auth/expired-action-code':
+                        errorMessage = 'Reset link has expired. Please request a new password reset.';
+                        break;
+                    case 'auth/invalid-action-code':
+                        errorMessage = 'Invalid reset link. Please request a new password reset.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password should be at least 6 characters long.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                showError(errorMessage);
+            }
+        }
+
+        // Setup Firebase Auth State Listener
+        function setupAuthStateListener() {
+            auth.onAuthStateChanged(async (user) => {
+                console.log('🔍 Auth state changed:', user ? user.uid : 'No user');
+                
+                if (user) {
+                    if (user.emailVerified) {
+                        console.log('✅ User authenticated and verified');
+                        await loadUserData(user);
+                        showMiningApp();
+                    } else {
+                        console.log('⚠️ User not verified, showing verification screen');
+                        showEmailVerification();
+                    }
+                } else {
+                    console.log('👤 No authenticated user, showing login');
+                    showLoginPage();
+                }
+            });
+        }
+
+        // Handle email verification callback
+        async function handleEmailVerification(actionCode) {
+            try {
+                await auth.applyActionCode(actionCode);
+                window.history.replaceState({}, document.title, window.location.pathname);
+                showSuccess('Email verified successfully! You can now sign in.');
+                setTimeout(() => {
+                    showLogin();
+                }, 2000);
+            } catch (error) {
+                console.error('❌ Email verification error:', error);
+                showError('Email verification failed: ' + error.message);
+                showLogin();
+            }
+        }
+
+        // Load user data
+        async function loadUserData(firebaseUser) {
+            try {
+                console.log('📊 Loading user data for:', firebaseUser.uid);
+                
+                const userDoc = await db.collection('users').doc(firebaseUser.uid).get();
+                
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    minedBalance = userData.minedBalance || 0.0000;
+                    receivedBalance = userData.receivedBalance || 0.0000;
+                    userBalance = minedBalance + receivedBalance;
+                    reserveBalance = userData.reserveBalance || 0.0000;
+                    lockedBalance = userData.lockedBalance || 0.0000;
+                    totalTasksCompleted = userData.tasksCompleted || 0;
+                    miningRate = userData.miningRate || 0.001;
+                    userWalletAddress = userData.walletAddress || generateWalletAddress();
+                    transactionHistory = userData.transactionHistory || [];
+                    console.log('✅ User data loaded from Firestore - Balance:', userBalance);
+                } else {
+                    userWalletAddress = generateWalletAddress();
+                    const newUserData = {
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        displayName: firebaseUser.displayName || 'Anonymous User',
+                        balance: 0.0000,
+                        minedBalance: 0.0000,
+                        receivedBalance: 0.0000,
+                        reserveBalance: 0.0000,
+                        lockedBalance: 0.0000,
+                        tasksCompleted: 0,
+                        miningRate: 0.001,
+                        walletAddress: userWalletAddress,
+                        transactionHistory: [],
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    await db.collection('users').doc(firebaseUser.uid).set(newUserData);
+                    console.log('🆕 New user document created');
+                }
+                
+                currentUser = {
+                    uid: firebaseUser.uid,
+                    email: firebaseUser.email,
+                    displayName: firebaseUser.displayName || 'Anonymous User',
+                    balance: userBalance,
+                    tasksCompleted: totalTasksCompleted,
+                    miningRate: miningRate,
+                    walletAddress: userWalletAddress
+                };
+                
+                updateUserDisplay();
+                
+            } catch (error) {
+                console.error('❌ Error loading user data:', error);
+                userBalance = 0.0000;
+                minedBalance = 0.0000;
+                receivedBalance = 0.0000;
+                reserveBalance = 0.0000;
+                lockedBalance = 0.0000;
+                totalTasksCompleted = 0;
+                miningRate = 0.001;
+                userWalletAddress = generateWalletAddress();
+                transactionHistory = [];
+            }
+        }
+
+        // Generate wallet address
+        function generateWalletAddress() {
+            const chars = '0123456789abcdef';
+            let address = '0x';
+            for (let i = 0; i < 40; i++) {
+                address += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return address;
+        }
+
+        // Save user data to Firestore
+        async function saveUserData() {
+            if (!currentUser || !currentUser.uid) return;
+            
+            try {
+                await db.collection('users').doc(currentUser.uid).update({
+                    balance: userBalance,
+                    minedBalance: minedBalance,
+                    receivedBalance: receivedBalance,
+                    reserveBalance: reserveBalance,
+                    lockedBalance: lockedBalance,
+                    tasksCompleted: totalTasksCompleted,
+                    miningRate: miningRate,
+                    walletAddress: userWalletAddress,
+                    transactionHistory: transactionHistory,
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log('💾 User data saved to Firestore');
+            } catch (error) {
+                console.error('❌ Error saving user data:', error);
+            }
+        }
+
+        // FIXED: Update user display including locked/reserve balances
+        function updateUserDisplay() {
+            if (!currentUser) return;
+            
+            // Update user info
+            document.getElementById('userName').textContent = currentUser.displayName || 'Anonymous User';
+            document.getElementById('userEmail').textContent = currentUser.email || 'No email';
+            document.getElementById('userAvatar').textContent = (currentUser.displayName || 'U').charAt(0).toUpperCase();
+            
+            // Update modal user info
+            document.getElementById('modalUserName').textContent = currentUser.displayName || 'Anonymous User';
+            document.getElementById('modalUserEmail').textContent = currentUser.email || 'No email';
+            document.getElementById('modalUserAvatar').textContent = (currentUser.displayName || 'U').charAt(0).toUpperCase();
+            document.getElementById('modalUserTasks').textContent = totalTasksCompleted;
+            document.getElementById('modalMinedBalance').textContent = minedBalance.toFixed(4) + ' iKb';
+            document.getElementById('modalReceivedBalance').textContent = receivedBalance.toFixed(4) + ' iKb';
+            
+            // Update balance displays
+            updateBalanceDisplay();
+            
+            // Update stats
+            document.getElementById('tasksCompleted').textContent = totalTasksCompleted;
+            document.getElementById('miningRate').textContent = miningRate.toFixed(3);
+            
+            // Update wallet address
+            if (userWalletAddress) {
+                document.getElementById('userWalletAddress').textContent = `${userWalletAddress.slice(0, 8)}...${userWalletAddress.slice(-6)}`;
+                document.getElementById('receiveAddress').textContent = userWalletAddress;
+            }
+        }
+
+        // FIXED: Update balance display including locked/reserve amounts
+        function updateBalanceDisplay() {
+            userBalance = minedBalance + receivedBalance;
+            
+            const balanceText = userBalance.toFixed(4) + ' iKb';
+            document.getElementById('balance').textContent = balanceText;
+            document.getElementById('totalBalance').textContent = balanceText;
+            document.getElementById('userAccountBalance').textContent = balanceText;
+            document.getElementById('walletBalance').textContent = balanceText;
+            
+            // FIXED: Update locked and reserve display
+            const displayLockedEl = document.getElementById('displayLockedBalance');
+            if (displayLockedEl) {
+                displayLockedEl.textContent = lockedBalance.toFixed(4) + ' iKb';
+            }
+            
+            const displayReserveEl = document.getElementById('displayReserveBalance');
+            if (displayReserveEl) {
+                displayReserveEl.textContent = reserveBalance.toFixed(4) + ' iKb';
+            }
+            
+            // Update modal available balances
+            const sendAvailableEl = document.getElementById('sendAvailableBalance');
+            if (sendAvailableEl) {
+                sendAvailableEl.textContent = balanceText;
+            }
+            
+            const swapAvailableEl = document.getElementById('swapAvailableBalance');
+            if (swapAvailableEl) {
+                swapAvailableEl.textContent = balanceText;
+            }
+            
+            const lockupAvailableEl = document.getElementById('lockupAvailableBalance');
+            if (lockupAvailableEl) {
+                lockupAvailableEl.textContent = balanceText;
+            }
+            
+            const reserveAvailableEl = document.getElementById('reserveAvailableBalance');
+            if (reserveAvailableEl) {
+                reserveAvailableEl.textContent = balanceText;
+            }
+            
+            const currentReserveEl = document.getElementById('currentReserveAmount');
+            if (currentReserveEl) {
+                currentReserveEl.textContent = reserveBalance.toFixed(4) + ' iKb';
+            }
+        }
+
+        // FIXED: Update swap preview with proper exchange rates
+        function updateSwapPreview() {
+            const amount = parseFloat(document.getElementById('swapAmount').value) || 0;
+            const fromCurrency = document.getElementById('swapFromCurrency').value;
+            const toCurrency = document.getElementById('swapToCurrency').value;
+            
+            const rateKey = `${fromCurrency}-${toCurrency}`;
+            const rate = exchangeRates[rateKey] || 0;
+            const receiveAmount = amount * rate;
+            
+            // Update rate display
+            const currencyNames = {
+                'ksh': 'KSH',
+                'usd': 'USD', 
+                'eur': 'EUR'
+            };
+            
+            document.getElementById('swapExchangeRate').textContent = `1 iKb = ${rate.toLocaleString()} ${currencyNames[toCurrency]}`;
+            document.getElementById('swapReceiveAmount').textContent = `${receiveAmount.toLocaleString()} ${currencyNames[toCurrency]}`;
+        }
+
+        // Authentication Functions
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address');
+                return;
+            }
+            
+            try {
+                hideMessages();
+                document.querySelector('#loginContainer .auth-button').textContent = 'Signing in...';
+                document.querySelector('#loginContainer .auth-button').disabled = true;
+                
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                if (!user.emailVerified) {
+                    showError('Please verify your email address first. Check your inbox for the verification link.');
+                    document.querySelector('#loginContainer .auth-button').textContent = 'Sign In';
+                    document.querySelector('#loginContainer .auth-button').disabled = false;
+                    return;
+                }
+                
+                console.log('✅ Login successful');
+                showSuccess('Login successful! Loading your mining dashboard...');
+                
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                document.querySelector('#loginContainer .auth-button').textContent = 'Sign In';
+                document.querySelector('#loginContainer .auth-button').disabled = false;
+                
+                let errorMessage = 'Login failed. ';
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email. Please sign up first.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Incorrect password. Please try again.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed attempts. Please try again later.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                showError(errorMessage);
+            }
+        }
+
+        async function handleSignup() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validation
+            if (!name) {
+                showError('Please enter your full name');
+                return;
+            }
+            
+            if (!email) {
+                showError('Please enter your email address');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address');
+                return;
+            }
+            
+            if (!password) {
+                showError('Please create a password');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters long');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            try {
+                hideMessages();
+                document.querySelector('#signupContainer .auth-button').textContent = 'Creating Account...';
+                document.querySelector('#signupContainer .auth-button').disabled = true;
+                
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                await user.updateProfile({
+                    displayName: name
+                });
+                
+                await user.sendEmailVerification({
+                    url: window.location.origin + window.location.pathname,
+                    handleCodeInApp: false
+                });
+                
+                console.log('✅ Account created, verification email sent');
+                showSuccess('Account created! Please check your email for verification instructions.');
+                showEmailVerification();
+                
+            } catch (error) {
+                console.error('❌ Signup error:', error);
+                document.querySelector('#signupContainer .auth-button').textContent = 'Create Account';
+                document.querySelector('#signupContainer .auth-button').disabled = false;
+                
+                let errorMessage = 'Account creation failed. ';
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'This email is already registered. Please sign in instead.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password should be at least 6 characters long.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                showError(errorMessage);
+            }
+        }
+
+        // FIXED: Password reset now uses correct URL for reset form
+        async function handlePasswordReset() {
+            const email = document.getElementById('resetEmail').value.trim();
+            
+            if (!email) {
+                showError('Please enter your email address');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address');
+                return;
+            }
+            
+            try {
+                hideMessages();
+                document.querySelector('#passwordResetContainer .auth-button').textContent = 'Sending...';
+                document.querySelector('#passwordResetContainer .auth-button').disabled = true;
+                
+                // FIXED: Send password reset with correct URL that will show reset form
+                await auth.sendPasswordResetEmail(email, {
+                    url: window.location.origin + window.location.pathname,
+                    handleCodeInApp: false
+                });
+                
+                showSuccess('Password reset email sent! Check your inbox and click the link to reset your password.');
+                setTimeout(() => {
+                    showLogin();
+                }, 3000);
                 
             } catch (error) {
                 console.error('❌ Password reset error:', error);
@@ -2596,440 +3026,8 @@
                 }
             }
         });
-                confirmation error:', error);
-                document.querySelector('#actualPasswordResetContainer .auth-button').textContent = 'Reset Password';
-                document.querySelector('#actualPasswordResetContainer .auth-button').disabled = false;
-                
-                let errorMessage = 'Password reset failed. ';
-                switch (error.code) {
-                    case 'auth/expired-action-code':
-                        errorMessage = 'Reset link has expired. Please request a new password reset.';
-                        break;
-                    case 'auth/invalid-action-code':
-                        errorMessage = 'Invalid reset link. Please request a new password reset.';
-                        break;
-                    case 'auth/weak-password':
-                        errorMessage = 'Password should be at least 6 characters long.';
-                        break;
-                    default:
-                        errorMessage += error.message;
-                }
-                showError(errorMessage);
-            }
-        }
 
-        // Setup Firebase Auth State Listener
-        function setupAuthStateListener() {
-            auth.onAuthStateChanged(async (user) => {
-                console.log('🔍 Auth state changed:', user ? user.uid : 'No user');
-                
-                if (user) {
-                    if (user.emailVerified) {
-                        console.log('✅ User authenticated and verified');
-                        await loadUserData(user);
-                        showMiningApp();
-                    } else {
-                        console.log('⚠️ User not verified, showing verification screen');
-                        showEmailVerification();
-                    }
-                } else {
-                    console.log('👤 No authenticated user, showing login');
-                    showLoginPage();
-                }
-            });
-        }
-
-        // Handle email verification callback
-        async function handleEmailVerification(actionCode) {
-            try {
-                await auth.applyActionCode(actionCode);
-                window.history.replaceState({}, document.title, window.location.pathname);
-                showSuccess('Email verified successfully! You can now sign in.');
-                setTimeout(() => {
-                    showLogin();
-                }, 2000);
-            } catch (error) {
-                console.error('❌ Email verification error:', error);
-                showError('Email verification failed: ' + error.message);
-                showLogin();
-            }
-        }
-
-        // Load user data
-        async function loadUserData(firebaseUser) {
-            try {
-                console.log('📊 Loading user data for:', firebaseUser.uid);
-                
-                const userDoc = await db.collection('users').doc(firebaseUser.uid).get();
-                
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    minedBalance = userData.minedBalance || 0.0000;
-                    receivedBalance = userData.receivedBalance || 0.0000;
-                    userBalance = minedBalance + receivedBalance;
-                    reserveBalance = userData.reserveBalance || 0.0000;
-                    lockedBalance = userData.lockedBalance || 0.0000;
-                    totalTasksCompleted = userData.tasksCompleted || 0;
-                    miningRate = userData.miningRate || 0.001;
-                    userWalletAddress = userData.walletAddress || generateWalletAddress();
-                    transactionHistory = userData.transactionHistory || [];
-                    console.log('✅ User data loaded from Firestore - Balance:', userBalance);
-                } else {
-                    userWalletAddress = generateWalletAddress();
-                    const newUserData = {
-                        uid: firebaseUser.uid,
-                        email: firebaseUser.email,
-                        displayName: firebaseUser.displayName || 'Anonymous User',
-                        balance: 0.0000,
-                        minedBalance: 0.0000,
-                        receivedBalance: 0.0000,
-                        reserveBalance: 0.0000,
-                        lockedBalance: 0.0000,
-                        tasksCompleted: 0,
-                        miningRate: 0.001,
-                        walletAddress: userWalletAddress,
-                        transactionHistory: [],
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        lastActive: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    
-                    await db.collection('users').doc(firebaseUser.uid).set(newUserData);
-                    console.log('🆕 New user document created');
-                }
-                
-                currentUser = {
-                    uid: firebaseUser.uid,
-                    email: firebaseUser.email,
-                    displayName: firebaseUser.displayName || 'Anonymous User',
-                    balance: userBalance,
-                    tasksCompleted: totalTasksCompleted,
-                    miningRate: miningRate,
-                    walletAddress: userWalletAddress
-                };
-                
-                updateUserDisplay();
-                
-            } catch (error) {
-                console.error('❌ Error loading user data:', error);
-                userBalance = 0.0000;
-                minedBalance = 0.0000;
-                receivedBalance = 0.0000;
-                reserveBalance = 0.0000;
-                lockedBalance = 0.0000;
-                totalTasksCompleted = 0;
-                miningRate = 0.001;
-                userWalletAddress = generateWalletAddress();
-                transactionHistory = [];
-            }
-        }
-
-        // Generate wallet address
-        function generateWalletAddress() {
-            const chars = '0123456789abcdef';
-            let address = '0x';
-            for (let i = 0; i < 40; i++) {
-                address += chars[Math.floor(Math.random() * chars.length)];
-            }
-            return address;
-        }
-
-        // Save user data to Firestore
-        async function saveUserData() {
-            if (!currentUser || !currentUser.uid) return;
-            
-            try {
-                await db.collection('users').doc(currentUser.uid).update({
-                    balance: userBalance,
-                    minedBalance: minedBalance,
-                    receivedBalance: receivedBalance,
-                    reserveBalance: reserveBalance,
-                    lockedBalance: lockedBalance,
-                    tasksCompleted: totalTasksCompleted,
-                    miningRate: miningRate,
-                    walletAddress: userWalletAddress,
-                    transactionHistory: transactionHistory,
-                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                console.log('💾 User data saved to Firestore');
-            } catch (error) {
-                console.error('❌ Error saving user data:', error);
-            }
-        }
-
-        // FIXED: Update user display including locked/reserve balances
-        function updateUserDisplay() {
-            if (!currentUser) return;
-            
-            // Update user info
-            document.getElementById('userName').textContent = currentUser.displayName || 'Anonymous User';
-            document.getElementById('userEmail').textContent = currentUser.email || 'No email';
-            document.getElementById('userAvatar').textContent = (currentUser.displayName || 'U').charAt(0).toUpperCase();
-            
-            // Update modal user info
-            document.getElementById('modalUserName').textContent = currentUser.displayName || 'Anonymous User';
-            document.getElementById('modalUserEmail').textContent = currentUser.email || 'No email';
-            document.getElementById('modalUserAvatar').textContent = (currentUser.displayName || 'U').charAt(0).toUpperCase();
-            document.getElementById('modalUserTasks').textContent = totalTasksCompleted;
-            document.getElementById('modalMinedBalance').textContent = minedBalance.toFixed(4) + ' iKb';
-            document.getElementById('modalReceivedBalance').textContent = receivedBalance.toFixed(4) + ' iKb';
-            
-            // Update balance displays
-            updateBalanceDisplay();
-            
-            // Update stats
-            document.getElementById('tasksCompleted').textContent = totalTasksCompleted;
-            document.getElementById('miningRate').textContent = miningRate.toFixed(3);
-            
-            // Update wallet address
-            if (userWalletAddress) {
-                document.getElementById('userWalletAddress').textContent = `${userWalletAddress.slice(0, 8)}...${userWalletAddress.slice(-6)}`;
-                document.getElementById('receiveAddress').textContent = userWalletAddress;
-            }
-        }
-
-        // FIXED: Update balance display including locked/reserve amounts
-        function updateBalanceDisplay() {
-            userBalance = minedBalance + receivedBalance;
-            
-            const balanceText = userBalance.toFixed(4) + ' iKb';
-            document.getElementById('balance').textContent = balanceText;
-            document.getElementById('totalBalance').textContent = balanceText;
-            document.getElementById('userAccountBalance').textContent = balanceText;
-            document.getElementById('walletBalance').textContent = balanceText;
-            
-            // FIXED: Update locked and reserve display
-            const displayLockedEl = document.getElementById('displayLockedBalance');
-            if (displayLockedEl) {
-                displayLockedEl.textContent = lockedBalance.toFixed(4) + ' iKb';
-            }
-            
-            const displayReserveEl = document.getElementById('displayReserveBalance');
-            if (displayReserveEl) {
-                displayReserveEl.textContent = reserveBalance.toFixed(4) + ' iKb';
-            }
-            
-            // Update modal available balances
-            const sendAvailableEl = document.getElementById('sendAvailableBalance');
-            if (sendAvailableEl) {
-                sendAvailableEl.textContent = balanceText;
-            }
-            
-            const swapAvailableEl = document.getElementById('swapAvailableBalance');
-            if (swapAvailableEl) {
-                swapAvailableEl.textContent = balanceText;
-            }
-            
-            const lockupAvailableEl = document.getElementById('lockupAvailableBalance');
-            if (lockupAvailableEl) {
-                lockupAvailableEl.textContent = balanceText;
-            }
-            
-            const reserveAvailableEl = document.getElementById('reserveAvailableBalance');
-            if (reserveAvailableEl) {
-                reserveAvailableEl.textContent = balanceText;
-            }
-            
-            const currentReserveEl = document.getElementById('currentReserveAmount');
-            if (currentReserveEl) {
-                currentReserveEl.textContent = reserveBalance.toFixed(4) + ' iKb';
-            }
-        }
-
-        // FIXED: Update swap preview with proper exchange rates
-        function updateSwapPreview() {
-            const amount = parseFloat(document.getElementById('swapAmount').value) || 0;
-            const fromCurrency = document.getElementById('swapFromCurrency').value;
-            const toCurrency = document.getElementById('swapToCurrency').value;
-            
-            const rateKey = `${fromCurrency}-${toCurrency}`;
-            const rate = exchangeRates[rateKey] || 0;
-            const receiveAmount = amount * rate;
-            
-            // Update rate display
-            const currencyNames = {
-                'ksh': 'KSH',
-                'usd': 'USD', 
-                'eur': 'EUR'
-            };
-            
-            document.getElementById('swapExchangeRate').textContent = `1 iKb = ${rate.toLocaleString()} ${currencyNames[toCurrency]}`;
-            document.getElementById('swapReceiveAmount').textContent = `${receiveAmount.toLocaleString()} ${currencyNames[toCurrency]}`;
-        }
-
-        // Authentication Functions
-        async function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!email || !password) {
-                showError('Please fill in all fields');
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                showError('Please enter a valid email address');
-                return;
-            }
-            
-            try {
-                hideMessages();
-                document.querySelector('#loginContainer .auth-button').textContent = 'Signing in...';
-                document.querySelector('#loginContainer .auth-button').disabled = true;
-                
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                
-                if (!user.emailVerified) {
-                    showError('Please verify your email address first. Check your inbox for the verification link.');
-                    document.querySelector('#loginContainer .auth-button').textContent = 'Sign In';
-                    document.querySelector('#loginContainer .auth-button').disabled = false;
-                    return;
-                }
-                
-                console.log('✅ Login successful');
-                showSuccess('Login successful! Loading your mining dashboard...');
-                
-            } catch (error) {
-                console.error('❌ Login error:', error);
-                document.querySelector('#loginContainer .auth-button').textContent = 'Sign In';
-                document.querySelector('#loginContainer .auth-button').disabled = false;
-                
-                let errorMessage = 'Login failed. ';
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                        errorMessage = 'No account found with this email. Please sign up first.';
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage = 'Incorrect password. Please try again.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'Please enter a valid email address.';
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage = 'Too many failed attempts. Please try again later.';
-                        break;
-                    default:
-                        errorMessage += error.message;
-                }
-                showError(errorMessage);
-            }
-        }
-
-        async function handleSignup() {
-            const name = document.getElementById('signupName').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            // Validation
-            if (!name) {
-                showError('Please enter your full name');
-                return;
-            }
-            
-            if (!email) {
-                showError('Please enter your email address');
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                showError('Please enter a valid email address');
-                return;
-            }
-            
-            if (!password) {
-                showError('Please create a password');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showError('Password must be at least 6 characters long');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showError('Passwords do not match');
-                return;
-            }
-            
-            try {
-                hideMessages();
-                document.querySelector('#signupContainer .auth-button').textContent = 'Creating Account...';
-                document.querySelector('#signupContainer .auth-button').disabled = true;
-                
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                
-                await user.updateProfile({
-                    displayName: name
-                });
-                
-                await user.sendEmailVerification({
-                    url: window.location.origin + window.location.pathname,
-                    handleCodeInApp: false
-                });
-                
-                console.log('✅ Account created, verification email sent');
-                showSuccess('Account created! Please check your email for verification instructions.');
-                showEmailVerification();
-                
-            } catch (error) {
-                console.error('❌ Signup error:', error);
-                document.querySelector('#signupContainer .auth-button').textContent = 'Create Account';
-                document.querySelector('#signupContainer .auth-button').disabled = false;
-                
-                let errorMessage = 'Account creation failed. ';
-                switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        errorMessage = 'This email is already registered. Please sign in instead.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'Please enter a valid email address.';
-                        break;
-                    case 'auth/weak-password':
-                        errorMessage = 'Password should be at least 6 characters long.';
-                        break;
-                    default:
-                        errorMessage += error.message;
-                }
-                showError(errorMessage);
-            }
-        }
-
-        // FIXED: Password reset now uses correct URL for reset form
-        async function handlePasswordReset() {
-            const email = document.getElementById('resetEmail').value.trim();
-            
-            if (!email) {
-                showError('Please enter your email address');
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                showError('Please enter a valid email address');
-                return;
-            }
-            
-            try {
-                hideMessages();
-                document.querySelector('#passwordResetContainer .auth-button').textContent = 'Sending...';
-                document.querySelector('#passwordResetContainer .auth-button').disabled = true;
-                
-                // FIXED: Send password reset with correct URL that will show reset form
-                await auth.sendPasswordResetEmail(email, {
-                    url: window.location.origin + window.location.pathname,
-                    handleCodeInApp: false
-                });
-                
-                showSuccess('Password reset email sent! Check your inbox and click the link to reset your password.');
-                setTimeout(() => {
-                    showLogin();
-                }, 3000);
-                
-            } catch (error) {
-                console.error('❌ Password reset
-
-        console.log('🚀 KABIRU Mining App with All Issues Fixed - Ready!');
+        console.log('🚀 KABIRU Mining App - All Issues Fixed and Ready!');
     </script>
 </body>
-</html>
+    </html>

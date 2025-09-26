@@ -1952,52 +1952,62 @@ function createFoundationModal() {
     `;
 }
 
-// Holdings Modal
 function createHoldingsModal() {
-    return `
-        <div class="modal-content">
-            <span class="close" onclick="closeAllModals()">&times;</span>
-            <h2>💼 Company Holdings</h2>
-            <p>Explore investment opportunities with Valenta Holdings</p>
-            
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                <h3>Current Holdings:</h3>
-                <ul style="text-align: left;">
-                    <li>Kabiru Digital Currency Platform</li>
-                    <li>TAU Africa Community Network</li>
-                    <li>Pan African Trust Graph System</li>
-                    <li>AUFFI Spiritual Centers</li>
-                </ul>
-            </div>
-            
-            <form onsubmit="processHoldingsInquiry(event)" id="holdingsForm">
-                <div class="form-group">
-                    <label>Your Name/Organization *</label>
-                    <input type="text" name="name" required>
+            return `
+                <div class="modal-content">
+                    <span class="close" onclick="closeAllModals()">&times;</span>
+                    <h2>🏢 Company Holdings</h2>
+                    <div style="padding: 20px;">
+                        <div style="background: linear-gradient(45deg, #9b59b6, #8e44ad); color: white; padding: 30px; border-radius: 15px; margin: 20px 0; text-align: center;">
+                            <h3>Valenta Holdings Portfolio</h3>
+                            <p>Strategic investments in African development</p>
+                        </div>
+                        
+                        <div style="display: grid; gap: 15px; margin: 20px 0;">
+                            <div style="border: 1px solid #ddd; padding: 15px; border-radius: 10px;">
+                                <h4>Kabiru Digital Currency</h4>
+                                <p>Revolutionary blockchain-based currency for African trade</p>
+                            </div>
+                            <div style="border: 1px solid #ddd; padding: 15px; border-radius: 10px;">
+                                <h4>AUFFI Community Network</h4>
+                                <p>Pan-African social and spiritual unity platform</p>
+                            </div>
+                            <div style="border: 1px solid #ddd; padding: 15px; border-radius: 10px;">
+                                <h4>Agricultural Innovation Centers</h4>
+                                <p>Modern farming techniques and food security</p>
+                            </div>
+                        </div>
+                        
+                        <form onsubmit="processHoldingsInquiry(event)">
+                            <div class="form-group">
+                                <label>Name/Organization *</label>
+                                <input type="text" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Interest *</label>
+                                <select name="interest" required>
+                                    <option value="">Select interest</option>
+                                    <option>Investment Opportunities</option>
+                                    <option>Partnership Proposals</option>
+                                    <option>Acquisition Inquiries</option>
+                                    <option>Joint Ventures</option>
+                                    <option>General Information</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Message *</label>
+                                <textarea name="message" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn">Submit Holdings Inquiry</button>
+                        </form>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Email *</label>
-                    <input type="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label>Investment Interest *</label>
-                    <select name="interest" required>
-                        <option value="">Select interest</option>
-                        <option value="Investment Opportunity">Investment Opportunity</option>
-                        <option value="Partnership">Strategic Partnership</option>
-                        <option value="Acquisition">Acquisition Discussion</option>
-                        <option value="Information">General Information</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Message *</label>
-                    <textarea name="message" rows="3" required></textarea>
-                </div>
-                <button type="submit" class="btn">Submit Inquiry</button>
-            </form>
-        </div>
-    `;
-}
+            `;
+        }
 
 // Par Sirai Modal
  function createParSiraiModal() {

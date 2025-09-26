@@ -1789,17 +1789,14 @@ function createCorporateModal() {
 }
 
 // Trust Graph Modal
-function createTrustGraphModal() {
-    return `
-        <div class="modal-content">
-            <span class="close" onclick="closeAllModals()">&times;</span>
-            <h2>📊 Trust Graph Ledger</h2>
-            <p>Access the Pan African Trust Graph system for transparent business relationships</p>
-            
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                <h3>Trust Graph Features:</h3>
-                <ul style="text-align: left;">
-                    <h3>Blockchain-Based Trust System</h3>
+        function createTrustGraphModal() {
+            return `
+                <div class="modal-content">
+                    <span class="close" onclick="closeAllModals()">&times;</span>
+                    <h2>🔗 Trust Graph Ledger</h2>
+                    <div style="padding: 20px; text-align: center;">
+                        <div style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 30px; border-radius: 15px; margin: 20px 0;">
+                            <h3>Blockchain-Based Trust System</h3>
                             <p>Building transparent and verifiable trust networks across Africa</p>
                         </div>
                         <p style="margin: 20px 0;">The Trust Graph Ledger is currently in development. This system will enable:</p>
@@ -1808,7 +1805,7 @@ function createTrustGraphModal() {
                             <li>Transparent transaction histories</li>
                             <li>Community-validated trust scores</li>
                             <li>Decentralized governance mechanisms</li>
-                </ul>
+                        </ul>
             </div>
             
             <form onsubmit="processTrustGraphAccess(event)" id="trustGraphForm">

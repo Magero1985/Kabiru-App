@@ -1915,45 +1915,64 @@ function createHoldingsModal() {
 }
 
 // Par Sirai Modal
-function createParSiraiModal() {
-    return `
-        <div class="modal-content">
-            <span class="close" onclick="closeAllModals()">&times;</span>
-            <h2>🌟 Par Sirai Center</h2>
-            <p>Join our spiritual and cultural awakening center for African unity</p>
-            
-            <form onsubmit="processParSiraiRegistration(event)" id="parSiraiForm">
-                <div class="form-group">
-                    <label>Full Name *</label>
-                    <input type="text" name="name" required>
+ function createParSiraiModal() {
+            return `
+                <div class="modal-content">
+                    <span class="close" onclick="closeAllModals()">&times;</span>
+                    <h2>🏛️ Par Sirai Center</h2>
+                    <p>Center for Knowledge and Spirituality within AUFFI</p>
+                    
+                    <div style="padding: 20px;">
+                        <div style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); color: white; padding: 30px; border-radius: 15px; margin: 20px 0; text-align: center;">
+                            <h3>Welcome to Par Sirai Center</h3>
+                            <p>The spiritual and intellectual heart of Pan-African awakening</p>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 15px;">
+                                <h4>📚 Knowledge Repository</h4>
+                                <p>Access to Pan-African history, philosophy, and wisdom traditions</p>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 15px;">
+                                <h4>🧘 Spiritual Practices</h4>
+                                <p>Meditation, prayer, and consciousness development programs</p>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 15px;">
+                                <h4>👥 Community Circles</h4>
+                                <p>Discussion groups and learning circles for spiritual growth</p>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 15px;">
+                                <h4>🌟 Awakening Programs</h4>
+                                <p>Structured programs for social and spiritual consciousness</p>
+                            </div>
+                        </div>
+                        
+                        <form onsubmit="processParSiraiRegistration(event)" style="margin-top: 30px;">
+                            <div class="form-group">
+                                <label>Name *</label>
+                                <input type="text" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Interest Area *</label>
+                                <select name="interest" required>
+                                    <option value="">Select area</option>
+                                    <option>Pan-African Book of Oloo</option>
+                                    <option>Spiritual Life of Oloo</option>
+                                    <option>Philosophy & Wisdom of Oloo</option>
+                                    <option>African Community Leadership</option>
+                                    <option>African Cultural Heritage</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn">Join Par Sirai Center</button>
+                        </form>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Email *</label>
-                    <input type="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label>Location *</label>
-                    <input type="text" name="location" required>
-                </div>
-                <div class="form-group">
-                    <label>Spiritual Interest *</label>
-                    <select name="interest" required>
-                        <option value="">Select interest</option>
-                        <option value="Rastafari">Rastafari Roots & Culture</option>
-                        <option value="Legio Maria">Legio Maria African Spirituality</option>
-                        <option value="Yie Kuom Chier">Yie Kuom Chier (Kikongo & Sulwe)</option>
-                        <option value="4th Generation">4th Generation Civilization</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>How did you find us?</label>
-                    <textarea name="referral" rows="2"></textarea>
-                </div>
-                <button type="submit" class="btn">Join Par Sirai Center</button>
-            </form>
-        </div>
-    `;
-}
+            `;
+        }
 
 // Forum Modal
 function createForumModal() {
